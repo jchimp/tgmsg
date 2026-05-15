@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Unified notification module (Telegram + Email fallback)
 
@@ -48,27 +48,46 @@ param(
 # ----------------------------------------------
 # Config from environment
 # ----------------------------------------------
+function Get-EnvVar {
+    param([string]$Name, [string]$Default = "")
+
+    $val = [System.Environment]::GetEnvironmentVariable($Name, "Process")
+    if (-not $val) { $val = [System.Environment]::GetEnvironmentVariable($Name, "User") }
+    if (-not $val) { $val = [System.Environment]::GetEnvironmentVariable($Name, "Machine") }
+    if (-not $val) { $val = $Default }
+    
+    return $val
+}
+
 function Get-NotifyConfig {
     @{
-        TgToken      = $env:TG_BOT_TOKEN
-        TgChatId     = $env:TG_CHAT_ID
-        SmtpHost     = if ($env:SMTP_HOST)     { $env:SMTP_HOST }     else { "localhost" }
-        SmtpPort     = if ($env:SMTP_PORT)     { [int]$env:SMTP_PORT } else { 25 }
-        SmtpFrom     = if ($env:SMTP_FROM)     { $env:SMTP_FROM }     else { "alerts@localhost" }
-        SmtpTo       = $env:SMTP_TO
-        SmtpUser     = $env:SMTP_USER
-        SmtpPass     = $env:SMTP_PASS
-        SmtpUseTls   = ($env:SMTP_USE_TLS -eq "true")
-        SubjectPfx   = if ($env:NOTIFY_SUBJECT) { $env:NOTIFY_SUBJECT } else { "[SysAlert]" }
+        TgToken    = (Get-EnvVar -Name "TG_BOT_TOKEN")
+        TgChatId   = (Get-EnvVar -Name "TG_CHAT_ID")
+        SmtpHost   = (Get-EnvVar -Name "SMTP_HOST" -Default "localhost")
+        SmtpPort   = [int](Get-EnvVar -Name "SMTP_PORT" -Default "25")
+        SmtpFrom   = (Get-EnvVar -Name "SMTP_FROM" -Default "alerts@localhost")
+        SmtpTo     = (Get-EnvVar -Name "SMTP_TO")
+        SmtpUser   = (Get-EnvVar -Name "SMTP_USER")
+        SmtpPass   = (Get-EnvVar -Name "SMTP_PASS")
+        SmtpUseTls = ((Get-EnvVar -Name "SMTP_USE_TLS" -Default "false") -eq "true")
+        SubjectPfx = (Get-EnvVar -Name "NOTIFY_SUBJECT" -Default "[SysAlert]")
     }
 }
 
 # Priority mappings
+<#
 $Script:PriorityMap = @{
     "silent"   = @{ Prefix = "$([char]0x2139)$([char]0xFE0F)";  Silent = $true  }   # ℹ️
     "normal"   = @{ Prefix = "$([char]0x26A0)$([char]0xFE0F)";  Silent = $false }   # ⚠️
     "critical" = @{ Prefix = [char]::ConvertFromUtf32(0x1F525); Silent = $false }   # 🔥
 }
+#>
+$Script:PriorityMap = @{
+    "silent"   = @{ Prefix = [System.Char]::ConvertFromUtf32(0x2139);  Silent = $true  }
+    "normal"   = @{ Prefix = [System.Char]::ConvertFromUtf32(0x26A0);  Silent = $false }
+    "critical" = @{ Prefix = [System.Char]::ConvertFromUtf32(0x1F525); Silent = $false }
+}
+
 
 # ----------------------------------------------
 # Internal: Send via Telegram
@@ -168,6 +187,7 @@ Hostname:  $hostname
         Body       = $emailBody
         SmtpServer = $cfg.SmtpHost
         Port       = $cfg.SmtpPort
+        Encoding   = [System.Text.Encoding]::UTF8
     }
 
     # Optional TLS
