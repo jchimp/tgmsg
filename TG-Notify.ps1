@@ -65,9 +65,9 @@ function Get-NotifyConfig {
 
 # Priority mappings
 $Script:PriorityMap = @{
-    "silent"   = @{ Prefix = [char]0x2139 + [char]0xFE0F;  Silent = $true  }    # ℹ️
-    "normal"   = @{ Prefix = [char]0x26A0 + [char]0xFE0F;  Silent = $false }    # ⚠️
-    "critical" = @{ Prefix = [char]0x1F525;                 Silent = $false }   # 🔥
+    "silent"   = @{ Prefix = "$([char]0x2139)$([char]0xFE0F)";  Silent = $true  }   # ℹ️
+    "normal"   = @{ Prefix = "$([char]0x26A0)$([char]0xFE0F)";  Silent = $false }   # ⚠️
+    "critical" = @{ Prefix = [char]::ConvertFromUtf32(0x1F525); Silent = $false }   # 🔥
 }
 
 # ----------------------------------------------
@@ -137,10 +137,15 @@ function Send-EmailFallback {
         return $false
     }
 
-    $prio      = $Script:PriorityMap[$Priority]
+    $prio = $Script:PriorityMap[$Priority]
     $timestamp = Get-Date -Format "yyyy-MM-ddTHH:mm:ssK"
-    $hostname  = $env:COMPUTERNAME ?? $(hostname)
-
+    If ($env:COMPUTERNAME) {
+        $hostname = $env:COMPUTERNAME    
+    }
+    else {
+        $hostname = $(hostname)
+    }
+    
     if (-not $Subject) {
         $Subject = "$($cfg.SubjectPfx) $($prio.Prefix) Alert - $($Priority.ToUpper())"
     }
@@ -173,7 +178,7 @@ Hostname:  $hostname
     # Optional credentials
     if ($cfg.SmtpUser -and $cfg.SmtpPass) {
         $secPass = ConvertTo-SecureString $cfg.SmtpPass -AsPlainText -Force
-        $cred    = New-Object System.Management.Automation.PSCredential($cfg.SmtpUser, $secPass)
+        $cred = New-Object System.Management.Automation.PSCredential($cfg.SmtpUser, $secPass)
         $mailParams["Credential"] = $cred
     }
 

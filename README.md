@@ -29,6 +29,17 @@ Set as system environment variables or in your PowerShell profile:
 [System.Environment]::SetEnvironmentVariable("SMTP_FROM", "alerts@company.com", "Machine")
 [System.Environment]::SetEnvironmentVariable("SMTP_TO", "jchampion@company.com", "Machine")
 ```
+> This method will write to the Registry and persist across reboots.
+
+ Or to set in the user session, like for testing, you can just set them directly:
+ ```powershell
+$env:TG_BOT_TOKEN = "ABCdefGHIjklMNOpqrsTUVwxyz"
+$env:TG_BOT_TOKEN = "987654321"
+$env:SMTP_HOST = "mail.company.com"
+$env:SMTP_FROM = "alerts@company.com"
+$env:SMTP_TO = "jchampion@company.com"
+ ```
+
 
 ## Usage
 
@@ -65,4 +76,13 @@ notify "*CRITICAL*: RAID degraded on $(hostname)" critical "RAID ALERT"
 . C:\Tools\Notify\TG-Notify.ps1
 Send-Notification -Message "Backup completed" -Priority silent
 Send-Notification -Message "*DISK ALERT*: E: drive at 95%" -Priority critical
+```
+
+
+### Environment Variables
+
+One-liner to check all environment variables in PowerShell:
+
+```powershell
+"TG_BOT_TOKEN","TG_CHAT_ID","SMTP_HOST","SMTP_FROM","SMTP_TO" | ForEach-Object {    [PSCustomObject]@{ Variable = $_; Value = [System.Environment]::GetEnvironmentVariable($_, "User") }} | Format-Table -AutoSize
 ```
