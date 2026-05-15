@@ -43,7 +43,7 @@ _send_telegram() {
     local priority="${2:-normal}"
 
     if [[ -z "$TG_BOT_TOKEN" || -z "$TG_CHAT_ID" ]]; then
-        echo "[notify] Telegram not configured, skipping." >&2
+        echo "[tg-notify] Telegram not configured, skipping." >&2
         return 1
     fi
 
@@ -76,10 +76,10 @@ EOF
     body=$(echo "$response" | sed '$d')
 
     if [[ "$http_code" == "200" ]]; then
-        echo "[notify] Telegram: sent successfully."
+        echo "[tg-notify] Telegram: sent successfully."
         return 0
     else
-        echo "[notify] Telegram failed (HTTP ${http_code}): ${body}" >&2
+        echo "[tg-notify] Telegram failed (HTTP ${http_code}): ${body}" >&2
         return 1
     fi
 }
@@ -94,7 +94,7 @@ _send_email() {
     local priority="${3:-normal}"
 
     if [[ -z "$SMTP_TO" ]]; then
-        echo "[notify] Email not configured (SMTP_TO missing), skipping." >&2
+        echo "[tg-notify] Email not configured (SMTP_TO missing), skipping." >&2
         return 1
     fi
 
@@ -139,10 +139,10 @@ EOF
     fi
 
     if echo "$email_body" | curl "${curl_args[@]}" 2>/dev/null; then
-        echo "[notify] Email: sent successfully."
+        echo "[tg-notify] Email: sent successfully."
         return 0
     else
-        echo "[notify] Email failed." >&2
+        echo "[tg-notify] Email failed." >&2
         return 1
     fi
 }
@@ -157,7 +157,7 @@ notify() {
     local subject="${3:-}"
 
     if [[ -z "$message" ]]; then
-        echo "[notify] Error: No message provided." >&2
+        echo "[tg-notify] Error: No message provided." >&2
         return 1
     fi
 
@@ -167,13 +167,13 @@ notify() {
     fi
 
     # Fallback: Email
-    echo "[notify] Falling back to email..." >&2
+    echo "[tg-notify] Falling back to email..." >&2
     local email_subject="${subject:-${NOTIFY_SUBJECT} $(date +%H:%M) - ${priority^^}}"
     if _send_email "$message" "$email_subject" "$priority"; then
         return 0
     fi
 
-    echo "[notify] *** ALL notification channels FAILED ***" >&2
+    echo "[tg-notify] *** ALL notification channels FAILED ***" >&2
     return 1
 }
 

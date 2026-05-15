@@ -60,7 +60,7 @@ PRIORITY_MAP = {
 def _send_telegram(message: str, priority: str = "normal") -> bool:
     """Send a message via Telegram Bot API. Returns True on success."""
     if not TG_BOT_TOKEN or not TG_CHAT_ID:
-        print("[notify] Telegram not configured, skipping.", file=sys.stderr)
+        print("[tg-notify] Telegram not configured, skipping.", file=sys.stderr)
         return False
 
     prefix, silent = PRIORITY_MAP.get(priority, PRIORITY_MAP["normal"])
@@ -84,20 +84,20 @@ def _send_telegram(message: str, priority: str = "normal") -> bool:
         with urllib.request.urlopen(req, timeout=10) as resp:
             result = json.loads(resp.read())
             if result.get("ok"):
-                print("[notify] Telegram: sent successfully.")
+                print("[tg-notify] Telegram: sent successfully.")
                 return True
             else:
-                print(f"[notify] Telegram API error: {result}", file=sys.stderr)
+                print(f"[tg-notify] Telegram API error: {result}", file=sys.stderr)
                 return False
     except (urllib.error.URLError, OSError) as e:
-        print(f"[notify] Telegram failed: {e}", file=sys.stderr)
+        print(f"[tg-notify] Telegram failed: {e}", file=sys.stderr)
         return False
 
 
 def _send_email(message: str, subject: str = "", priority: str = "normal") -> bool:
     """Send a message via SMTP email. Returns True on success."""
     if not SMTP_TO:
-        print("[notify] Email not configured (SMTP_TO missing), skipping.", file=sys.stderr)
+        print("[tg-notify] Email not configured (SMTP_TO missing), skipping.", file=sys.stderr)
         return False
 
     recipients = [addr.strip() for addr in SMTP_TO.split(",")]
@@ -127,10 +127,10 @@ def _send_email(message: str, subject: str = "", priority: str = "normal") -> bo
 
         server.sendmail(SMTP_FROM, recipients, msg.as_string())
         server.quit()
-        print("[notify] Email: sent successfully.")
+        print("[tg-notify] Email: sent successfully.")
         return True
     except Exception as e:
-        print(f"[notify] Email failed: {e}", file=sys.stderr)
+        print(f"[tg-notify] Email failed: {e}", file=sys.stderr)
         return False
 
 
@@ -156,12 +156,12 @@ def notify(message: str, priority: str = "normal", subject: str = "") -> dict:
         return result
 
     # Fallback: Email
-    print("[notify] Falling back to email...", file=sys.stderr)
+    print("[tg-notify] Falling back to email...", file=sys.stderr)
     result["email"] = _send_email(message, subject, priority)
     result["delivered"] = result["email"]
 
     if not result["delivered"]:
-        print("[notify] *** ALL notification channels FAILED ***", file=sys.stderr)
+        print("[tg-notify] *** ALL notification channels FAILED ***", file=sys.stderr)
 
     return result
 

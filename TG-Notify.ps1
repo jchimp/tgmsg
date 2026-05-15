@@ -82,7 +82,7 @@ function Send-Telegram {
     $cfg = Get-NotifyConfig
 
     if (-not $cfg.TgToken -or -not $cfg.TgChatId) {
-        Write-Warning "[notify] Telegram not configured, skipping."
+        Write-Warning "[tg-notify] Telegram not configured, skipping."
         return $false
     }
 
@@ -106,16 +106,16 @@ function Send-Telegram {
             -ErrorAction Stop
 
         if ($response.ok -eq $true) {
-            Write-Host "[notify] Telegram: sent successfully."
+            Write-Host "[tg-notify] Telegram: sent successfully."
             return $true
         }
         else {
-            Write-Warning "[notify] Telegram API returned unexpected response."
+            Write-Warning "[tg-notify] Telegram API returned unexpected response."
             return $false
         }
     }
     catch {
-        Write-Warning "[notify] Telegram failed: $_"
+        Write-Warning "[tg-notify] Telegram failed: $_"
         return $false
     }
 }
@@ -133,7 +133,7 @@ function Send-EmailFallback {
     $cfg = Get-NotifyConfig
 
     if (-not $cfg.SmtpTo) {
-        Write-Warning "[notify] Email not configured (SMTP_TO missing), skipping."
+        Write-Warning "[tg-notify] Email not configured (SMTP_TO missing), skipping."
         return $false
     }
 
@@ -184,11 +184,11 @@ Hostname:  $hostname
 
     try {
         Send-MailMessage @mailParams -ErrorAction Stop
-        Write-Host "[notify] Email: sent successfully."
+        Write-Host "[tg-notify] Email: sent successfully."
         return $true
     }
     catch {
-        Write-Warning "[notify] Email failed: $_"
+        Write-Warning "[tg-notify] Email failed: $_"
         return $false
     }
 }
@@ -222,12 +222,12 @@ function Send-Notification {
     }
 
     # Fallback: Email
-    Write-Warning "[notify] Falling back to email..."
+    Write-Warning "[tg-notify] Falling back to email..."
     $result.Email = Send-EmailFallback -Message $Message -Subject $Subject -Priority $Priority
     $result.Delivered = $result.Email
 
     if (-not $result.Delivered) {
-        Write-Error "[notify] *** ALL notification channels FAILED ***"
+        Write-Error "[tg-notify] *** ALL notification channels FAILED ***"
     }
 
     return [PSCustomObject]$result
