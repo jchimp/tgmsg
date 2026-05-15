@@ -81,7 +81,21 @@ Send-Notification -Message "*DISK ALERT*: E: drive at 95%" -Priority critical
 
 ### Environment Variables
 
-One-liner to check all environment variables in PowerShell:
+| Variable | Description |
+|---|---|
+TG_BOT_TOKEN | Telegram Bot API token
+TG_CHAT_ID | Telegram chat/group ID
+SMTP_HOST | SMTP server (default: localhost)
+SMTP_PORT | SMTP port (default: 25)
+SMTP_FROM | Sender address
+SMTP_TO | Recipient address
+SMTP_USER | SMTP username (optional, triggers auth)
+SMTP_PASS | SMTP password (optional)
+SMTP_USE_TLS | "true" to enable STARTTLS (default: false)
+NOTIFY_SUBJECT | Default subject prefix (default: [SysAlert])
+
+
+One-liner to check all environment variables in PowerShell for "User" values:
 
 ```powershell
 "TG_BOT_TOKEN","TG_CHAT_ID","SMTP_HOST","SMTP_FROM","SMTP_TO" | ForEach-Object {    [PSCustomObject]@{ Variable = $_; Value = [System.Environment]::GetEnvironmentVariable($_, "User") }} | Format-Table -AutoSize
