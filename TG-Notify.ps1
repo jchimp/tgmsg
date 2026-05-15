@@ -75,13 +75,6 @@ function Get-NotifyConfig {
 }
 
 # Priority mappings
-<#
-$Script:PriorityMap = @{
-    "silent"   = @{ Prefix = "$([char]0x2139)$([char]0xFE0F)";  Silent = $true  }   # ℹ️
-    "normal"   = @{ Prefix = "$([char]0x26A0)$([char]0xFE0F)";  Silent = $false }   # ⚠️
-    "critical" = @{ Prefix = [char]::ConvertFromUtf32(0x1F525); Silent = $false }   # 🔥
-}
-#>
 $Script:PriorityMap = @{
     "silent"   = @{ Prefix = [System.Char]::ConvertFromUtf32(0x2139);  Silent = $true  }
     "normal"   = @{ Prefix = [System.Char]::ConvertFromUtf32(0x26A0);  Silent = $false }
@@ -99,7 +92,6 @@ function Send-Telegram {
     )
 
     $cfg = Get-NotifyConfig
-
     if (-not $cfg.TgToken -or -not $cfg.TgChatId) {
         Write-Warning "[tg-notify] Telegram not configured, skipping."
         return $false
@@ -107,7 +99,6 @@ function Send-Telegram {
 
     $prio   = $Script:PriorityMap[$Priority]
     $text   = "$($prio.Prefix) $Message"
-
     $body = @{
         chat_id              = $cfg.TgChatId
         text                 = $text
@@ -150,7 +141,6 @@ function Send-EmailFallback {
     )
 
     $cfg = Get-NotifyConfig
-
     if (-not $cfg.SmtpTo) {
         Write-Warning "[tg-notify] Email not configured (SMTP_TO missing), skipping."
         return $false
@@ -179,7 +169,6 @@ Hostname:  $hostname
 "@
 
     $recipients = $cfg.SmtpTo -split "," | ForEach-Object { $_.Trim() }
-
     $mailParams = @{
         From       = $cfg.SmtpFrom
         To         = $recipients
@@ -235,7 +224,6 @@ function Send-Notification {
 
     # Primary: Telegram
     $result.Telegram = Send-Telegram -Message $Message -Priority $Priority
-
     if ($result.Telegram) {
         $result.Delivered = $true
         return [PSCustomObject]$result
@@ -245,7 +233,6 @@ function Send-Notification {
     Write-Warning "[tg-notify] Falling back to email..."
     $result.Email = Send-EmailFallback -Message $Message -Subject $Subject -Priority $Priority
     $result.Delivered = $result.Email
-
     if (-not $result.Delivered) {
         Write-Error "[tg-notify] *** ALL notification channels FAILED ***"
     }

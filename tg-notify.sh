@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ──────────────────────────────────────────────────────────
+#-------------------------------------------------------------
 # tg-notify.sh - Unified notification (Telegram + Email fallback)
 #
 # Environment Variables:
@@ -20,7 +20,7 @@
 #
 # Usage standalone:
 #   ./tg-notify.sh "Server is DOWN" [silent|normal|critical] ["Optional Subject"]
-# ──────────────────────────────────────────────────────────
+#-------------------------------------------------------------
 
 # Defaults (override via environment)
 TG_BOT_TOKEN="${TG_BOT_TOKEN:-}"

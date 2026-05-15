@@ -35,9 +35,9 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 
-# ──────────────────────────────────────────────
+#-----------------------------------------------
 # Config from environment
-# ──────────────────────────────────────────────
+#-----------------------------------------------
 TG_BOT_TOKEN = os.environ.get("TG_BOT_TOKEN", "")
 TG_CHAT_ID   = os.environ.get("TG_CHAT_ID", "")
 SMTP_HOST    = os.environ.get("SMTP_HOST", "localhost")
@@ -150,7 +150,6 @@ def notify(message: str, priority: str = "normal", subject: str = "") -> dict:
 
     # Primary: Telegram
     result["telegram"] = _send_telegram(message, priority)
-
     if result["telegram"]:
         result["delivered"] = True
         return result
@@ -159,7 +158,6 @@ def notify(message: str, priority: str = "normal", subject: str = "") -> dict:
     print("[tg-notify] Falling back to email...", file=sys.stderr)
     result["email"] = _send_email(message, subject, priority)
     result["delivered"] = result["email"]
-
     if not result["delivered"]:
         print("[tg-notify] *** ALL notification channels FAILED ***", file=sys.stderr)
 
