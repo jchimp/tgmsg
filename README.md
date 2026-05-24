@@ -1,4 +1,4 @@
-# tg-notify
+# tgmsg
 
 ## Overview
 
@@ -18,7 +18,7 @@ export TGMSG_CHAT_ID="987654321"
 export TGMSG_SMTP_HOST="mail.company.com"
 export TGMSG_SMTP_PORT="25"
 export TGMSG_SMTP_FROM="alerts@company.com"
-export TGMSG_SMTP_TO="jchampion@company.com"
+export TGMSG_SMTP_TO="user@company.com"
 ```
 
 ### Windows
@@ -29,7 +29,7 @@ Set as system environment variables or in your PowerShell profile:
 [System.Environment]::SetEnvironmentVariable("TGMSG_CHAT_ID", "987654321", "Machine")
 [System.Environment]::SetEnvironmentVariable("TGMSG_SMTP_HOST", "mail.company.com", "Machine")
 [System.Environment]::SetEnvironmentVariable("TGMSG_SMTP_FROM", "alerts@company.com", "Machine")
-[System.Environment]::SetEnvironmentVariable("TGMSG_SMTP_TO", "jchampion@company.com", "Machine")
+[System.Environment]::SetEnvironmentVariable("TGMSG_SMTP_TO", "user@company.com", "Machine")
 ```
 > This method will write to the Registry and persist across reboots.
 
@@ -39,7 +39,7 @@ $env:TGMSG_BOT_TOKEN = "ABCdefGHIjklMNOpqrsTUVwxyz"
 $env:TGMSG_BOT_TOKEN = "987654321"
 $env:TGMSG_SMTP_HOST = "mail.company.com"
 $env:TGMSG_SMTP_FROM = "alerts@company.com"
-$env:TGMSG_SMTP_TO = "jchampion@company.com"
+$env:TGMSG_SMTP_TO = "user@company.com"
  ```
 
 
@@ -52,8 +52,8 @@ $env:TGMSG_SMTP_TO = "jchampion@company.com"
 python3 tgmsg.py "prod-db-01 disk at 95%" --priority critical
 
 # As module in your Flask apps
-from tgmsg import notify
-notify("*Backup completed*\nHost: `prod-web-03`\nDuration: 12m", priority="normal")
+from tgmsg import tgmsg
+tgmsg("*Backup completed*\nHost: `prod-web-03`\nDuration: 12m", priority="normal")
 ```
 
 ### Bash
@@ -64,8 +64,8 @@ notify("*Backup completed*\nHost: `prod-web-03`\nDuration: 12m", priority="norma
 
 # As a library (source it from other scripts)
 source /usr/local/lib/tgmsg.sh
-notify "Backup completed on $(hostname)" silent
-notify "*CRITICAL*: RAID degraded on $(hostname)" critical "RAID ALERT"
+tgmsg "Backup completed on $(hostname)" silent
+tgmsg "*CRITICAL*: RAID degraded on $(hostname)" critical "RAID ALERT"
 ```
 
 ### PowerShell
