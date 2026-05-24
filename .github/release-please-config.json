@@ -1,0 +1,10 @@
+{
+  "release-type": "simple",
+  "include-v-in-tag": true,
+  "extra-files": [
+    {
+      "type": "generic",
+      "path": "VERSION"
+    }
+  ]
+}
