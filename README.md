@@ -6,7 +6,15 @@
 
 The scripts are written in __Python__, __bash__, and __PowerShell__, so there should be one to fit most script or workflow needs. The scripts can be called on the command line or sourced and used inside of scripts.
 
-## Priority Levels
+### Scripts
+
+| Filename | Description | 
+|---|---|
+| Send-TGMsg.ps1 | PowerShell script. Main function: `Send-TGMsg(message, [priority], [subject])` |
+| tgmsg.py | Python script. Main function: `tgmsg(message, [priority], [subject])` |
+| tgmsg.sh | Bash script. Main function: `tgmsg(message, [priority], [subject])` |
+
+### Priority Levels
 
 | Priority | Emoji | Telegram Behavior | Syslog Severity | RFC 3164 Code |
 |---|---|---|---|---|
