@@ -25,7 +25,7 @@ The scripts are written in __Python__, __bash__, and __PowerShell__, so there sh
 
 ---
 
-## Install
+## Installation
 
 Clone the repo. No external dependencies — each script uses only standard library.
 
@@ -61,7 +61,7 @@ Send-TGMsg -Message "*DISK ALERT*: E: drive at 95%" -Priority critical
 ```
 
 
-## Telegram Bot Setup
+### Telegram Bot Setup
 
 One-time setup, takes about 5 minutes.
 
