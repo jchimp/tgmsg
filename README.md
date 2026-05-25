@@ -2,7 +2,7 @@
 
 ## Overview
 
-**tgmsg** is a set of scripts to send a notification from the command line or from inside of a script to Telegram with an email fallback.
+**tgmsg** is a set of scripts to send a notification to **Telegram** with an **email** fallback, and to a **syslog** server based on message priority.
 
 The scripts are written in __Python__, __bash__, and __PowerShell__, so there should be one to fit most script or workflow needs. The scripts can be called on the command line or sourced and used inside of scripts.
 

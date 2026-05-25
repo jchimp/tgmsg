@@ -46,7 +46,7 @@ param(
 )
 
 # ──────────────────────────────────────────────
-# Env helper: Process → User → Machine → Default
+# Env helper: Process -> User -> Machine -> Default
 # ──────────────────────────────────────────────
 function Get-EnvVar {
     param([string]$Name, [string]$Default = "")
@@ -88,7 +88,7 @@ $Script:PriorityMap = @{
 $Script:LevelRank = @{ "all" = 0; "normal" = 1; "warning" = 2; "critical" = 3 }
 
 # ──────────────────────────────────────────────
-# Internal: Send via Syslog (UDP, RFC 3164)
+# Internal: Send via Syslog (UDP)
 # ──────────────────────────────────────────────
 function Send-Syslog {
     param(
@@ -277,7 +277,6 @@ function Send-TGMsg {
 
     # Primary: Telegram
     $result.Telegram = Send-Telegram -Message $Message -Priority $Priority
-
     if ($result.Telegram) {
         $result.Delivered = $true
         return [PSCustomObject]$result
@@ -287,11 +286,9 @@ function Send-TGMsg {
     Write-Warning "[tgmsg] Falling back to email..."
     $result.Email = Send-EmailFallback -Message $Message -Subject $Subject -Priority $Priority
     $result.Delivered = $result.Email
-
     if (-not $result.Delivered) {
         Write-Error "[tgmsg] *** ALL notification channels FAILED ***"
     }
-
     return [PSCustomObject]$result
 }
 

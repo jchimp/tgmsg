@@ -8,6 +8,8 @@ import os
 import json
 import socket
 import unittest
+import socket
+import smtplib 
 from unittest.mock import patch, MagicMock
 
 # Set test env vars before importing tgmsg
@@ -86,7 +88,7 @@ class TestShouldSyslog(unittest.TestCase):
 class TestSendSyslog(unittest.TestCase):
     """Test syslog UDP send."""
 
-    @patch("tgmsg.socket.socket")
+    @patch.object(socket, "socket")
     def test_syslog_sends_udp_packet(self, mock_socket_cls):
         tgmsg.SYSLOG_HOST = "127.0.0.1"
         tgmsg.SYSLOG_PORT = 1514
@@ -98,21 +100,21 @@ class TestSendSyslog(unittest.TestCase):
         result = tgmsg._send_syslog("test message", "critical")
 
         self.assertTrue(result)
-        mock_sock.tgmsgto.assert_called_once()
-        sent_data = mock_sock.tgmsgto.call_args[0][0].decode("utf-8")
+        mock_sock.sendto.assert_called_once()
+        sent_data = mock_sock.sendto.call_args[0][0].decode("utf-8")
         self.assertIn("tgmsg:", sent_data)
         self.assertIn("[CRITICAL]", sent_data)
         self.assertIn("test message", sent_data)
         # Verify RFC 3164 PRI: local0(16) * 8 + critical(2) = 130
         self.assertTrue(sent_data.startswith("<130>"))
 
-    @patch("tgmsg.socket.socket")
+    @patch.object(socket, "socket")
     def test_syslog_handles_network_error(self, mock_socket_cls):
         tgmsg.SYSLOG_HOST = "127.0.0.1"
         tgmsg.SYSLOG_LEVEL = "all"
 
         mock_sock = MagicMock()
-        mock_sock.tgmsgto.side_effect = OSError("Network unreachable")
+        mock_sock.sendto.side_effect = OSError("Network unreachable")
         mock_socket_cls.return_value = mock_sock
 
         result = tgmsg._send_syslog("fail test", "normal")
@@ -128,13 +130,11 @@ class TestSendSyslog(unittest.TestCase):
 class TestSendTelegram(unittest.TestCase):
     """Test Telegram API calls."""
 
-    @patch("tgmsg.urllib.request.urlopen")
+    @patch("urllib.request.urlopen")
     def test_telegram_success(self, mock_urlopen):
-        mock_resp = MagicMock()
-        mock_resp.read.return_value = json.dumps({"ok": True}).encode()
-        mock_resp.__enter__ = lambda s: mock_resp
-        mock_resp.__exit__ = MagicMock(return_value=False)
-        mock_urlopen.return_value = mock_resp
+        mock_ctx = MagicMock()
+        mock_ctx.read.return_value = json.dumps({"ok": True}).encode()
+        mock_urlopen.return_value.__enter__.return_value = mock_ctx
 
         tgmsg.TG_BOT_TOKEN = "111111:AAAA-test-token"
         tgmsg.TG_CHAT_ID = "999999"
@@ -143,18 +143,16 @@ class TestSendTelegram(unittest.TestCase):
         self.assertTrue(result)
         mock_urlopen.assert_called_once()
 
-    @patch("tgmsg.urllib.request.urlopen")
+    @patch("urllib.request.urlopen")
     def test_telegram_api_error(self, mock_urlopen):
-        mock_resp = MagicMock()
-        mock_resp.read.return_value = json.dumps({"ok": False, "description": "Bad Request"}).encode()
-        mock_resp.__enter__ = lambda s: mock_resp
-        mock_resp.__exit__ = MagicMock(return_value=False)
-        mock_urlopen.return_value = mock_resp
+        mock_ctx = MagicMock()
+        mock_ctx.read.return_value = json.dumps({"ok": False, "description": "Bad Request"}).encode()
+        mock_urlopen.return_value.__enter__.return_value = mock_ctx
 
         result = tgmsg._send_telegram("test message", "normal")
         self.assertFalse(result)
 
-    @patch("tgmsg.urllib.request.urlopen", side_effect=OSError("Connection refused"))
+    @patch("urllib.request.urlopen", side_effect=OSError("Connection refused"))
     def test_telegram_network_error(self, mock_urlopen):
         result = tgmsg._send_telegram("test message", "critical")
         self.assertFalse(result)
@@ -172,7 +170,7 @@ class TestSendTelegram(unittest.TestCase):
 class TestSendEmail(unittest.TestCase):
     """Test SMTP email."""
 
-    @patch("tgmsg.smtplib.SMTP")
+    @patch.object(smtplib, "SMTP")
     def test_email_success(self, mock_smtp_cls):
         mock_server = MagicMock()
         mock_smtp_cls.return_value = mock_server
@@ -181,10 +179,10 @@ class TestSendEmail(unittest.TestCase):
         result = tgmsg._send_email("test email", "", "warning")
 
         self.assertTrue(result)
-        mock_server.tgmsgmail.assert_called_once()
+        mock_server.sendmail.assert_called_once()
         mock_server.quit.assert_called_once()
 
-    @patch("tgmsg.smtplib.SMTP", side_effect=OSError("Connection refused"))
+    @patch.object(smtplib, "SMTP", side_effect=OSError("Connection refused"))
     def test_email_connection_error(self, mock_smtp_cls):
         result = tgmsg._send_email("fail test", "", "normal")
         self.assertFalse(result)

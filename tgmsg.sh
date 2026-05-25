@@ -67,9 +67,9 @@ _syslog_severity() {
 _priority_prefix() {
     case "$1" in
         silent)   printf '\xe2\x84\xb9\xef\xb8\x8f' ;;   # ℹ️
-        normal)   printf '\xe2\x9c\x85' ;;                 # ✅
+        normal)   printf '\xe2\x9c\x85' ;;               # ✅
         warning)  printf '\xe2\x9a\xa0\xef\xb8\x8f' ;;   # ⚠️
-        critical) printf '\xf0\x9f\x94\xa5' ;;             # 🔥
+        critical) printf '\xf0\x9f\x94\xa5' ;;           # 🔥
         *)        printf '\xe2\x9c\x85' ;;
     esac
 }

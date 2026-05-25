@@ -56,18 +56,18 @@ SYSLOG_HOST    = os.environ.get("TGMSG_SYSLOG_HOST", "")
 SYSLOG_PORT    = int(os.environ.get("TGMSG_SYSLOG_PORT", "514"))
 SYSLOG_LEVEL   = os.environ.get("TGMSG_SYSLOG_LEVEL", "all").lower()
 
-# Priority hierarchy (lowest → highest)
+SYSLOG_FACILITY = 16  # local0
+
+# Priority hierarchy (lowest -> highest)
 PRIORITY_ORDER = {"silent": 0, "normal": 1, "warning": 2, "critical": 3}
 
-# Priority → Telegram emoji prefix, syslog severity
+# Priority -> Telegram emoji prefix, syslog severity
 PRIORITY_MAP = {
-    "silent":   {"prefix": "\u2139\uFE0F",  "silent": True,  "syslog_severity": 6},  # ℹ️  Informational
-    "normal":   {"prefix": "\u2705",         "silent": False, "syslog_severity": 5},  # ✅  Notice
-    "warning":  {"prefix": "\u26A0\uFE0F",  "silent": False, "syslog_severity": 4},  # ⚠️  Warning
-    "critical": {"prefix": "\U0001F525",     "silent": False, "syslog_severity": 2},  # 🔥 Critical
+    "silent":   {"prefix": "\u2139\uFE0F",  "silent": True,  "syslog_severity": 6},     # ℹ️ Informational
+    "normal":   {"prefix": "\u2705",        "silent": False, "syslog_severity": 5},     # ✅ Notice
+    "warning":  {"prefix": "\u26A0\uFE0F",  "silent": False, "syslog_severity": 4},     # ⚠️ Warning
+    "critical": {"prefix": "\U0001F525",    "silent": False, "syslog_severity": 2},     # 🔥 Critical
 }
-
-SYSLOG_FACILITY = 16  # local0
 
 
 def _should_syslog(priority: str) -> bool:
