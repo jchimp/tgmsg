@@ -17,19 +17,19 @@
 
 .EXAMPLE
     # Standalone
-    .\TG-Notify.ps1 -Message "Server is DOWN" -Priority critical
+    .\Send-TGMsg.ps1 -Message "Server is DOWN" -Priority critical
 
 .EXAMPLE
     # Dot-source as a library
-    . C:\Tools\Notify\TG-Notify.ps1
+    . C:\Tools\Notify\Send-TGMsg.ps1
     Send-Notification -Message "Backup OK" -Priority silent
 
 .NOTES
     Environment Variables:
-        TG_BOT_TOKEN, TG_CHAT_ID
-        SMTP_HOST, SMTP_PORT, SMTP_FROM, SMTP_TO
-        SMTP_USER, SMTP_PASS, SMTP_USE_TLS
-        NOTIFY_SUBJECT
+        TGMSG_BOT_TOKEN, TGMSG_CHAT_ID
+        TGMSG_SMTP_HOST, TGMSG_SMTP_PORT, TGMSG_SMTP_FROM, TGMSG_SMTP_TO
+        TGMSG_SMTP_USER, TGMSG_SMTP_PASS, TGMSG_SMTP_USE_TLS
+        TGMSG_SUBJECT
 #>
 
 [CmdletBinding()]
@@ -61,16 +61,16 @@ function Get-EnvVar {
 
 function Get-NotifyConfig {
     @{
-        TgToken    = (Get-EnvVar -Name "TG_BOT_TOKEN")
-        TgChatId   = (Get-EnvVar -Name "TG_CHAT_ID")
-        SmtpHost   = (Get-EnvVar -Name "SMTP_HOST" -Default "localhost")
-        SmtpPort   = [int](Get-EnvVar -Name "SMTP_PORT" -Default "25")
-        SmtpFrom   = (Get-EnvVar -Name "SMTP_FROM" -Default "alerts@localhost")
-        SmtpTo     = (Get-EnvVar -Name "SMTP_TO")
-        SmtpUser   = (Get-EnvVar -Name "SMTP_USER")
-        SmtpPass   = (Get-EnvVar -Name "SMTP_PASS")
-        SmtpUseTls = ((Get-EnvVar -Name "SMTP_USE_TLS" -Default "false") -eq "true")
-        SubjectPfx = (Get-EnvVar -Name "NOTIFY_SUBJECT" -Default "[SysAlert]")
+        TgToken    = (Get-EnvVar -Name "TGMSG_BOT_TOKEN")
+        TgChatId   = (Get-EnvVar -Name "TGMSG_CHAT_ID")
+        SmtpHost   = (Get-EnvVar -Name "TGMSG_SMTP_HOST" -Default "localhost")
+        SmtpPort   = [int](Get-EnvVar -Name "TGMSG_SMTP_PORT" -Default "25")
+        SmtpFrom   = (Get-EnvVar -Name "TGMSG_SMTP_FROM" -Default "alerts@localhost")
+        SmtpTo     = (Get-EnvVar -Name "TGMSG_SMTP_TO")
+        SmtpUser   = (Get-EnvVar -Name "TGMSG_SMTP_USER")
+        SmtpPass   = (Get-EnvVar -Name "TGMSG_SMTP_PASS")
+        SmtpUseTls = ((Get-EnvVar -Name "TGMSG_SMTP_USE_TLS" -Default "false") -eq "true")
+        SubjectPfx = (Get-EnvVar -Name "TGMSG_SUBJECT" -Default "[SysAlert]")
     }
 }
 
@@ -142,7 +142,7 @@ function Send-EmailFallback {
 
     $cfg = Get-NotifyConfig
     if (-not $cfg.SmtpTo) {
-        Write-Warning "[tg-notify] Email not configured (SMTP_TO missing), skipping."
+        Write-Warning "[tg-notify] Email not configured (TGMSG_SMTP_TO missing), skipping."
         return $false
     }
 
@@ -205,7 +205,7 @@ Hostname:  $hostname
 # ----------------------------------------------
 # Public: Main notification function
 # ----------------------------------------------
-function Send-Notification {
+function Send-TGMsg {
     param(
         [Parameter(Mandatory)]
         [string]$Message,
@@ -230,11 +230,11 @@ function Send-Notification {
     }
 
     # Fallback: Email
-    Write-Warning "[tg-notify] Falling back to email..."
+    Write-Warning "[tgmsg] Falling back to email..."
     $result.Email = Send-EmailFallback -Message $Message -Subject $Subject -Priority $Priority
     $result.Delivered = $result.Email
     if (-not $result.Delivered) {
-        Write-Error "[tg-notify] *** ALL notification channels FAILED ***"
+        Write-Error "[tgmsg] *** ALL notification channels FAILED ***"
     }
 
     return [PSCustomObject]$result
