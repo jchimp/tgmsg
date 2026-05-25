@@ -18,7 +18,7 @@ export TGMSG_CHAT_ID="987654321"
 export TGMSG_SMTP_HOST="mail.company.com"
 export TGMSG_SMTP_PORT="25"
 export TGMSG_SMTP_FROM="alerts@company.com"
-export TGMSG_SMTP_TO="user@company.com"
+export TGMSG_SMTP_TO="user@company.com" 
 ```
 
 ### Windows
