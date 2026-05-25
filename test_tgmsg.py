@@ -95,8 +95,8 @@ class TestSendSyslog(unittest.TestCase):
         result = tgmsg._send_syslog("test message", "critical")
 
         self.assertTrue(result)
-        mock_sock.sendto.assert_called_once()
-        sent_data = mock_sock.sendto.call_args[0][0].decode("utf-8")
+        mock_sock.tgmsgto.assert_called_once()
+        sent_data = mock_sock.tgmsgto.call_args[0][0].decode("utf-8")
         self.assertIn("tgmsg:", sent_data)
         self.assertIn("[CRITICAL]", sent_data)
         self.assertIn("test message", sent_data)
@@ -109,7 +109,7 @@ class TestSendSyslog(unittest.TestCase):
         tgmsg.SYSLOG_LEVEL = "all"
 
         mock_sock = MagicMock()
-        mock_sock.sendto.side_effect = OSError("Network unreachable")
+        mock_sock.tgmsgto.side_effect = OSError("Network unreachable")
         mock_socket_cls.return_value = mock_sock
 
         result = tgmsg._send_syslog("fail test", "normal")
@@ -178,7 +178,7 @@ class TestSendEmail(unittest.TestCase):
         result = tgmsg._send_email("test email", "", "warning")
 
         self.assertTrue(result)
-        mock_server.sendmail.assert_called_once()
+        mock_server.tgmsgmail.assert_called_once()
         mock_server.quit.assert_called_once()
 
     @patch("tgmsg.smtplib.SMTP", side_effect=OSError("Connection refused"))
@@ -199,7 +199,7 @@ class TestSend(unittest.TestCase):
     @patch("tgmsg._send_syslog", return_value=True)
     @patch("tgmsg._send_telegram", return_value=True)
     def test_telegram_success_skips_email(self, mock_tg, mock_syslog):
-        result = tgmsg.send("test", "normal")
+        result = tgmsg.tgmsg("test", "normal")
         self.assertTrue(result["delivered"])
         self.assertTrue(result["telegram"])
         self.assertFalse(result["email"])
@@ -208,7 +208,7 @@ class TestSend(unittest.TestCase):
     @patch("tgmsg._send_telegram", return_value=False)
     @patch("tgmsg._send_email", return_value=True)
     def test_telegram_fail_falls_back_to_email(self, mock_email, mock_tg, mock_syslog):
-        result = tgmsg.send("test", "normal")
+        result = tgmsg.tgmsg("test", "normal")
         self.assertTrue(result["delivered"])
         self.assertFalse(result["telegram"])
         self.assertTrue(result["email"])
@@ -217,19 +217,19 @@ class TestSend(unittest.TestCase):
     @patch("tgmsg._send_telegram", return_value=False)
     @patch("tgmsg._send_email", return_value=False)
     def test_all_channels_fail(self, mock_email, mock_tg, mock_syslog):
-        result = tgmsg.send("test", "critical")
+        result = tgmsg.tgmsg("test", "critical")
         self.assertFalse(result["delivered"])
 
     @patch("tgmsg._send_syslog", return_value=True)
     @patch("tgmsg._send_telegram", return_value=True)
     def test_syslog_fires_regardless(self, mock_tg, mock_syslog):
-        tgmsg.send("test", "critical")
+        tgmsg.tgmsg("test", "critical")
         mock_syslog.assert_called_once()
 
     @patch("tgmsg._send_syslog", return_value=True)
     @patch("tgmsg._send_telegram", return_value=True)
     def test_result_contains_all_keys(self, mock_tg, mock_syslog):
-        result = tgmsg.send("test", "normal")
+        result = tgmsg.tgmsg("test", "normal")
         self.assertIn("telegram", result)
         self.assertIn("email", result)
         self.assertIn("syslog", result)
