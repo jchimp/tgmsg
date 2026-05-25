@@ -113,7 +113,8 @@ function Send-Syslog {
     $facility  = 16  # local0
     $pri       = ($facility * 8) + $prio.SyslogSeverity
     $timestamp = (Get-Date).ToString("MMM dd HH:mm:ss")
-    $hostname  = $env:COMPUTERNAME ?? $(hostname)
+    $hostname = $env:COMPUTERNAME
+    if (-not $hostname) { $hostname = $(hostname) }
 
     $syslogMsg = "<${pri}>${timestamp} ${hostname} tgmsg: [$($Priority.ToUpper())] ${Message}"
     $bytes     = [System.Text.Encoding]::UTF8.GetBytes($syslogMsg)
@@ -201,7 +202,8 @@ function Send-EmailFallback {
 
     $prio      = $Script:PriorityMap[$Priority]
     $timestamp = Get-Date -Format "yyyy-MM-ddTHH:mm:ssK"
-    $hostname  = $env:COMPUTERNAME ?? $(hostname)
+    $hostname = $env:COMPUTERNAME
+    if (-not $hostname) { $hostname = $(hostname) }
 
     if (-not $Subject) {
         $Subject = "$($cfg.SubjectPfx) $($prio.Prefix) Alert - $($Priority.ToUpper())"

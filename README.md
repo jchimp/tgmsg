@@ -15,15 +15,6 @@ The scripts are written in __Python__, __bash__, and __PowerShell__, so there sh
 | `warning` | ⚠️ | Normal | Warning | 4 |
 | `critical` | 🔥 | Normal | Critical | 2 |
 
-### Syslog Threshold Behavior
-
-| `TGMSG_SYSLOG_LEVEL` | Sends to syslog on... |
-|---|---|
-| `all` | silent, normal, warning, critical |
-| `normal` | normal, warning, critical |
-| `warning` | warning, critical |
-| `critical` | critical only |
-
 ---
 
 ## Install
@@ -36,18 +27,20 @@ git clone https://github.com/youruser/tgmsg.git
 
 ### Python
 ```bash
-As a CLI tool
+# As a CLI tool
 cp tgmsg.py /usr/local/bin/tgmsg
 chmod +x /usr/local/bin/tgmsg
 
 # As a module for import
 cp tgmsg.py /usr/local/lib/tgmsg.py
 ```
+
 ### Bash
 ```bash
 cp tgmsg.sh /usr/local/lib/tgmsg.sh
 chmod +x /usr/local/lib/tgmsg.sh
 ```
+
 ### PowerShell
 ```powershell
 # Standalone
@@ -66,7 +59,7 @@ One-time setup, takes about 5 minutes.
 
 1. Create a Bot
     - Open Telegram → search for @BotFather
-    - Send /newbot
+    - Send `/newbot`
     - Give it a name (e.g., Ops Alerts) and a username ending in bot (e.g., mycompany_ops_bot)
     - BotFather replies with your Bot Token — looks like: 123456789:ABCdefGHIjklMNOpqrsTUVwxyz
 
@@ -141,7 +134,7 @@ $vars.GetEnumerator() | ForEach-Object {
     [System.Environment]::SetEnvironmentVariable($_.Key, $_.Value, "User")
 }
 ```
-> Note: Restart your shell after setting variables. Or use "Machine" scope from an elevated prompt for system-wide access.
+> **IMPORTANT:** Restart your shell after setting variables. Or use **"Machine"** scope from an elevated prompt for system-wide access.
 
 ---
 
@@ -206,4 +199,4 @@ _Time:_ $(date)" --priority critical
 ```
 
 Renders as:
-**CRITICAL** _Host:_ prod-db-01 _Disk:_ 95% full _Time:_ Mon May 12 20:45:00 MDT 2026
+> **CRITICAL** _Host:_ prod-db-01 _Disk:_ 95% full _Time:_ Mon May 12 20:45:00 MDT 2026
