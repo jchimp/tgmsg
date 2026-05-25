@@ -22,7 +22,7 @@ The scripts are written in __Python__, __bash__, and __PowerShell__, so there sh
 Clone the repo. No external dependencies — each script uses only standard library.
 
 ```bash
-git clone https://github.com/youruser/tgmsg.git
+git clone https://github.com/jchimp/tgmsg.git
 ```
 
 ### Python
