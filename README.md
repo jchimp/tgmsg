@@ -26,8 +26,7 @@ The scripts are written in __Python__, __bash__, and __PowerShell__, so there sh
 ---
 
 ## Installation
-
-Clone the repo. No external dependencies — each script uses only standard library.
+Clone the repo. No external dependencies — each script uses only standard libraries.
 
 ```bash
 git clone https://github.com/jchimp/tgmsg.git
@@ -60,11 +59,8 @@ Send-TGMsg -Message "Backup completed" -Priority silent
 Send-TGMsg -Message "*DISK ALERT*: E: drive at 95%" -Priority critical
 ```
 
-
 ### Telegram Bot Setup
-
-One-time setup, takes about 5 minutes.
-
+One-time setup:
 1. Create a Bot
     - Open Telegram → search for @BotFather
     - Send `/newbot`
@@ -91,7 +87,6 @@ To send to a group: create a group, add the bot, send a message in the group, th
 ---
 
 ## Configuration
-
 All config is via environment variables prefixed `TGMSG_`.
 
 | Variable             | Required | Default            | Description                                                 |
